@@ -74,19 +74,20 @@ var handlePick = function (pick, callback) {
 
     if (blacks.length > 300) {
       callback({ action: 'land' });
-    } else if(blacks.length > 10) {
+    } else if(blacks.length > 15) {
       callback({ action: 'onBlacks' });
     } else if (twoReds && minRed > Math.PI * 3/8 && minRed < Math.PI * 5/8) {
       callback({ action: 'goForward' });
     } else if (twoReds) {
       callback({ action: 'onCourseMaybe' });
-    } else {
+    } else if (reds.length > 0 ) {
       sum = _.reduce(reds, function(memo, num){ return memo + num; }, 0);
       newAngle = sum / reds.length;
       if (typeof newAngle !== 'number') { newAngle = 0; }
       callback({ action: 'rotate', val: newAngle });
-    } 
-
+    } else {
+      callback({ action: 'lost' });
+    }
   });
 
 };
