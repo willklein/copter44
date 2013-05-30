@@ -22,12 +22,16 @@ var sampleRate = 500;
 var state = 'takeoff';
 
 var translate = function(action) {
+    console.log('- action: ' + action.action);
     switch(action.action) {
         case 'goForward':
             return 'forward';
+        
         case 'onCourseMaybe':
             return 'on';
+        
         case 'rotate':
+            console.log('-    val: ' + action.val);
             return (action.val < 3.14 / 2) ? 'right' : 'left';
         
         default:
@@ -43,9 +47,10 @@ var translate = function(action) {
 };
 
 var runLogic = function(action) {
+    console.log('state: ' + state);
 
     var land = function() {
-        this.land();
+        client.land();
         state = 'landing';
     };
 
@@ -54,21 +59,22 @@ var runLogic = function(action) {
     if (lineCheck === 'lost') {
         land();
     }
+    console.log('lineCheck: ' + lineCheck);
     
     var findLine = function() {
         switch (lineCheck) {
             // on the line
             case 'forward':
             case 'on':
-                front(0.25);
+                client.front(0.1);
                 state = 'lineFound';
                 break;
             
             case 'right':
-                clockwise(0.25);
+                client.clockwise(0.25);
                 break;
             case 'left':
-                clockwise(0.25);
+                client.clockwise(0.25);
                 break;
         }
     };
@@ -77,19 +83,19 @@ var runLogic = function(action) {
         switch (lineCheck) {
             
             case 'forward':
-                front(0.25);
+                client.front(0.25);
                 break;
             
             case 'on':
-                front(0.25);
+                client.front(0.25);
                 state = 'tracking';
                 break;
 
             case 'right':
-                clockwise(0.25);
+                client.clockwise(0.25);
                 break;
             case 'left':
-                clockwise(0.25);
+                client.clockwise(0.25);
                 break;
         }
     };
@@ -97,13 +103,13 @@ var runLogic = function(action) {
     var trackLine = function() {
         switch (lineCheck) {
             case 'on':
-                front(0.25);
+                client.front(0.25);
                 break;
             case 'right':
-                clockwise(0.25);
+                client.clockwise(0.25);
                 break;
             case 'left':
-                clockwise(0.25);
+                client.clockwise(0.25);
                 break;
             
             case 'box':
@@ -149,34 +155,22 @@ var runLogic = function(action) {
 };
 
 var eventLoop = setInterval(function() {
-    // do stuff w/ lastPng
-    var done = angle.handlePick(lastPng, runLogic);
+    if (!lastPng) return;
     
-    if (done) {
+    // do stuff w/ lastPng
+    angle.handlePick(lastPng, runLogic);
+    
+    if (state === 'landing') {
         clearInterval(eventLoop);
     }
 }, sampleRate);
 
-var server = http.createServer(function(req, res) {
-    if (!lastPng) {
-        res.writeHead(503);
-        res.end('Did not receive any png data yet.');
-        return;
-    }
-
-    res.writeHead(200, {'Content-Type': 'image/png'});
-    res.end(lastPng);
-});
-
-server.listen(3000, function() {
-    console.log('Serving latest png on port 8080 ...');
-});
 
 client.takeoff();
 
 client.up(2);
 
-client.after(8000, function() {
+client.after(4000, function() {
 //    this.clockwise(0.5);
 //    this.forward(1);
     this.stop();
@@ -184,6 +178,4 @@ client.after(8000, function() {
     this.stop();
     this.land();
     pngStream.end();
-}). after(5000, function() {
-    server.close();
 });
