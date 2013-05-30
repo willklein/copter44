@@ -29,7 +29,7 @@ var handlePick = function (pick, callback) {
       var deltaY = Math.floor(Math.sin(angle) * radius);
       //console.log('angle, radius, deltaX, deltaY', angle, radius, deltaX, deltaY);
       var x = centerX + deltaX;
-      var y = centerY + deltaY;
+      var y = centerY - deltaY;
       //console.log('(x,y)', x, y);
 
       var pixRow = im.pixelRow(y);
@@ -83,6 +83,7 @@ var handlePick = function (pick, callback) {
     } else {
       sum = _.reduce(reds, function(memo, num){ return memo + num; }, 0);
       newAngle = sum / reds.length;
+      if (typeof newAngle !== 'number') { newAngle = 0; }
       callback({ action: 'rotate', val: newAngle });
     } 
 
