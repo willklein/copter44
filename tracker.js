@@ -1,5 +1,7 @@
 var http = require('http');
 
+var angle = require('./angle.js');
+
 var arDrone = require('ar-drone');
 var client  = arDrone.createClient();
 
@@ -19,7 +21,20 @@ var sampleRate = 500;
 
 var state = 'takeoff';
 
-var checkForLine = function() {
+var translate = function(action) {
+    switch(action.action) {
+        case 'goForward':
+            return 'forward';
+        case 'onCourseMaybe':
+            return 'on';
+        case 'rotate':
+            return (action.val < 3.14 / 2) ? 'right' : 'left';
+        
+        default:
+            return 'box';
+    }
+    
+//    angle.handlePick()
     // 'right'
     // 'left'
     // 'forward'
@@ -27,14 +42,14 @@ var checkForLine = function() {
     return state;  
 };
 
-var runLogic = function() {
+var runLogic = function(action) {
 
     var land = function() {
         this.land();
         state = 'landing';
     };
 
-    var lineCheck = checkForLine();
+    var lineCheck = translate(action);
     
     if (lineCheck === 'lost') {
         land();
@@ -135,7 +150,7 @@ var runLogic = function() {
 
 var eventLoop = setInterval(function() {
     // do stuff w/ lastPng
-    var done = runLogic();
+    var done = angle.handlePick(lastPng, runLogic);
     
     if (done) {
         clearInterval(eventLoop);
