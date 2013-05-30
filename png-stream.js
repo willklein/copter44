@@ -57,7 +57,7 @@ client.takeoff();
 
 client.up(2);
 
-client.after(5000, function() {
+client.after(8000, function() {
 //    this.clockwise(0.5);
 //    this.forward(1);
     this.stop();
