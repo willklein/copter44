@@ -70,6 +70,7 @@ var handlePick = function (pick, callback) {
     var maxRed = _.max(reds);
     console.log('minRed, maxRed', minRed, maxRed);
     var twoReds = maxRed > minRed + Math.PI;
+    var newAngle, sum;
 
     if (blacks.length > 300) {
       callback({ action: 'land' });
@@ -80,7 +81,9 @@ var handlePick = function (pick, callback) {
     } else if (twoReds) {
       callback({ action: 'onCourseMaybe' });
     } else {
-      callback({ action: 'rotate', val: minRed });
+      sum = _.reduce(reds, function(memo, num){ return memo + num; }, 0);
+      newAngle = sum / reds.length;
+      callback({ action: 'rotate', val: newAngle });
     } 
 
   });
