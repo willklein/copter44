@@ -15,6 +15,7 @@ var isBlack = function(r, g, b) {
 
 
 var handlePick = function (pick, callback) {
+//    console.log('pick.length: ' + pick.length);
   //im.pixelRow(0).length
   cv.readImage(pick, function(err, im) {
     var radius = im.height() / 2 * .95;
