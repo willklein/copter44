@@ -17,31 +17,87 @@ pngStream.on('error', console.log)
 
 var sampleRate = 500;
 
-var finiteStateBot = {
-    state: 'takeoff'  
+var state = 'takeoff';
+
+var checkForLine = function() {
+    // 'right'
+    // 'left'
+    // 'forward'
+    // 'on'
+    return state;  
 };
 
 var runLogic = function() {
-    var findLine = function() {
-        var lineCheck = checkForLine();
-        
-        lineCheck = lineCheck * (scale || 1);
-        
-        
-        
-    };
-
-    var trackLine = function() {
-
-    };
-
-    var centerBox = function() {
-        this.stop();
-    };
 
     var land = function() {
         this.land();
         state = 'landing';
+    };
+
+    var lineCheck = checkForLine();
+    
+    if (lineCheck === 'lost') {
+        land();
+    }
+    
+    var findLine = function() {
+        switch (lineCheck) {
+            // on the line
+            case 'forward':
+            case 'on':
+                front(0.25);
+                state = 'lineFound';
+                break;
+            
+            case 'right':
+                clockwise(0.25);
+                break;
+            case 'left':
+                clockwise(0.25);
+                break;
+        }
+    };
+
+    var followLine = function() {
+        switch (lineCheck) {
+            
+            case 'forward':
+                front(0.25);
+                break;
+            
+            case 'on':
+                front(0.25);
+                state = 'tracking';
+                break;
+
+            case 'right':
+                clockwise(0.25);
+                break;
+            case 'left':
+                clockwise(0.25);
+                break;
+        }
+    };
+
+    var trackLine = function() {
+        switch (lineCheck) {
+            case 'on':
+                front(0.25);
+                break;
+            case 'right':
+                clockwise(0.25);
+                break;
+            case 'left':
+                clockwise(0.25);
+                break;
+            
+            case 'box':
+                land();
+        }
+    };
+
+    var centerBox = function() {
+        this.stop();
     };
     
     switch (state) {
